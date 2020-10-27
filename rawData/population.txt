@@ -1,7 +1,16 @@
 [Español]
 
-La información referente a la población a nivel municipal puede ser recuperada en la página de la [CONAPO](https://www.gob.mx/conapo/documentos/proyecciones-de-la-poblacion-de-los-municipios-de-mexico-2015-2030)
+La información referente a la población a nivel municipal puede ser recuperada en la página de la CONAPO:
 
+https://www.gob.mx/conapo/documentos/proyecciones-de-la-poblacion-de-los-municipios-de-mexico-2015-2030
 
+Importante poner atención en el Estado de Oaxaca que aparece con una sintaxis distinta.
 
 [English]
+
+Information regarding the population at the municipal level can be found on the CONAPO website:
+
+
+https://www.gob.mx/conapo/documentos/proyecciones-de-la-poblacion-de-los-municipios-de-mexico-2015-2030
+
+It is important to pay attention to the State of Oaxaca that appears with a different syntax (name).
