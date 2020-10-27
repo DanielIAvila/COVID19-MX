@@ -13,7 +13,7 @@ Código: Avila-Ortega, Daniel Itzamna (2020). DanielIAvila - COVID19-MX GitHub R
 Datos:
 
 El orden de uso de los códigos para lograr reproducir los resultados obtenidos es el siguiente:
-1.
+1. processRawData.py
 2.
 3.
 
@@ -30,6 +30,6 @@ Index:
 Data:
 
 The order of use of the codes to reproduce the results obtained is as follows:
-1.
+1. processRawData.py
 2.
 3.
