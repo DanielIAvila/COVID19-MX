@@ -14,8 +14,9 @@ Datos:
 
 El orden de uso de los códigos para lograr reproducir los resultados obtenidos es el siguiente:
 1. processRawData.py
-2.
-3.
+2. mergeData.py
+3. assembleScore.py
+4. processSSA.py
 
 [English]
 
@@ -31,5 +32,6 @@ Data:
 
 The order of use of the codes to reproduce the results obtained is as follows:
 1. processRawData.py
-2.
-3.
+2. mergeData.py
+3. assembleScore.py
+4. processSSA.py
