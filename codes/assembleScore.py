@@ -2,10 +2,13 @@
 """
 Created on Wed Apr 29 12:29:37 2020
 
-@author: DanielAvila
-
-        This code differs as it calculates the percentage of a given comorbidity 
-        with regards to the population.
+@author: Daniel Itzamna Avila Ortega
+@Institution: Mexican Center of Industrial Ecology
+@DOI: https://doi.org/10.22201/igg.25940694e.2020.2.73    
+@Publication: An index of municipality-level vulnerability to COVID-19 in Mexico.
+    
+        This is the third code from the research on the Vulnerability Index 
+        for municipalities in Mexico with regards to the COVID19.
 """
 
 import gc
@@ -16,7 +19,7 @@ import pandas as pd
     #        Loads files to process       #
     #######################################
 
-clean_data = 'D:/Users/Daniel_Avila/Documents/CMEI/Proyectos/Covid19/Articulo/data/clean/'
+clean_data = '~/CleanData/'
 
 # Loads files
 pop_muni_cohort = pd.read_csv(clean_data + 'pop_muni_cohort.csv', index_col=0)
@@ -29,7 +32,9 @@ diabetes = pd.read_csv(clean_data + 'diabetes.csv', index_col=0)
 hypertension = pd.read_csv(clean_data + 'hypertension.csv', index_col=0)
 cardiovascular = pd.read_csv(clean_data + 'cardiovascular.csv', index_col=0)
 renal = pd.read_csv(clean_data + 'renal.csv', index_col=0)
+
 #%%
+# Commorbities percentage
 obesity['%-Obesity-Mun'] = obesity['POP-Obesity'].div(obesity['POB_x'])
 smoking['%-Smoking-Mun'] = smoking['POP-Smoking'].div(smoking['POB_x'])
 diabetes['%-Diabetes-Mun'] = diabetes['POP-Diabetes'].div(diabetes['POB_x'])
@@ -39,7 +44,8 @@ renal['%-Renal-Mun'] = renal['POP-Renal'].div(renal['POB_x'])
 
 #%%
 def stats(dataframe, column='', comorbidity=''):
-    """ """
+    """ This function calculates the statistics of a given dataframe.
+        """
     
     local = dataframe.copy()
     local_a = local.groupby(['CLAVE','NOM_ENT','CLAVE_ENT', 'MUN','SEXO','RANGO'])[column].sum().reset_index()
@@ -61,7 +67,9 @@ renal_stats, renal_descriptive = stats(renal, 'POP-Renal','renal')
 #%%
         
 def categorize(dataframe, column='', score=''):
-    """ """
+    """ This function categorizes the each municipality according with their 
+        statistics. """
+
     conditions = [
             (dataframe[column] > dataframe['25%']) & (dataframe[column] > dataframe['50%']) & (dataframe[column] > dataframe['75%']),
             (dataframe[column] > dataframe['25%']) & (dataframe[column] > dataframe['50%']) & (dataframe[column] < dataframe['75%']),
@@ -81,17 +89,19 @@ diabetes_stats = categorize(diabetes_stats, 'POP-Diabetes', 'S_diabetes')
 hypertension_stats = categorize(hypertension_stats, 'POP-Hypertension', 'S_hypertension')
 cardiovascular_stats = categorize(cardiovascular_stats, 'POP-Cardiovascular', 'S_cardiovascular')
 renal_stats = categorize(renal_stats, 'POP-Renal', 'S_renal')
-#%%
-#writer = pd.ExcelWriter(clean_data + 'ComorbitiesStatsV2.xlsx', engine='xlsxwriter')
-    
-#obesity_stats.to_excel(writer, sheet_name='obesity_stats', index=False)
-#smoking_stats.to_excel(writer, sheet_name='smoking_stats', index=False)
-#diabetes_stats.to_excel(writer, sheet_name='diabetes_stats', index=False)
-#hypertension_stats.to_excel(writer, sheet_name='hypertension_stats', index=False)
-#cardiovascular_stats.to_excel(writer, sheet_name='cardiovascular_stats', index=False)
-#renal_stats.to_excel(writer, sheet_name='renal_stats', index=False)
 
-#writer.save()
+#%%
+# Save information to an Excel document
+writer = pd.ExcelWriter(clean_data + 'ComorbitiesStatsV2.xlsx', engine='xlsxwriter')
+    
+obesity_stats.to_excel(writer, sheet_name='obesity_stats', index=False)
+smoking_stats.to_excel(writer, sheet_name='smoking_stats', index=False)
+diabetes_stats.to_excel(writer, sheet_name='diabetes_stats', index=False)
+hypertension_stats.to_excel(writer, sheet_name='hypertension_stats', index=False)
+cardiovascular_stats.to_excel(writer, sheet_name='cardiovascular_stats', index=False)
+renal_stats.to_excel(writer, sheet_name='renal_stats', index=False)
+
+writer.save()
 
 #%%
 
@@ -104,43 +114,35 @@ pop_muni_cohort_score = pop_muni_cohort.merge(age_cohort_score, on=['RANGO'], ho
 
 condition_sex = [pop_muni_cohort_score['SEXO'] == 'Hombres', pop_muni_cohort_score['SEXO'] == 'Mujeres']
 choice_sex = [0.67, 0.33]
+
 # Assigns score per sex to dataframe
 pop_muni_cohort_score['S-sex'] = np.select(condition_sex, choice_sex)
-#%%
-
-vulnerability_data = pop_muni_cohort_score.merge(obesity_stats, 
-                                                 on=['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN', 'SEXO', 'RANGO'],
-                                                 how='left')
-vulnerability_data = vulnerability_data.drop(['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'], axis=1)
 
 #%%
-vulnerability_data = vulnerability_data.merge(smoking_stats, 
-                                                 on=['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN', 'SEXO', 'RANGO'],
-                                                 how='left')
-vulnerability_data = vulnerability_data.drop(['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'], axis=1)
+on = ['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN', 'SEXO', 'RANGO']
+drop = ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']
+
+vulnerability_data = pop_muni_cohort_score.merge(obesity_stats, on=on, how='left')
+vulnerability_data = vulnerability_data.drop(drop, axis=1)
 
 #%%
-vulnerability_data = vulnerability_data.merge(diabetes_stats, 
-                                                 on=['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN', 'SEXO', 'RANGO'],
-                                                 how='left')
-vulnerability_data = vulnerability_data.drop(['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'], axis=1)
+vulnerability_data = vulnerability_data.merge(smoking_stats, on=on, how='left')
+vulnerability_data = vulnerability_data.drop(drop, axis=1)
 
 #%%
-vulnerability_data = vulnerability_data.merge(hypertension_stats, 
-                                                 on=['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN', 'SEXO', 'RANGO'],
-                                                 how='left')
-vulnerability_data = vulnerability_data.drop(['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'], axis=1)
+vulnerability_data = vulnerability_data.merge(diabetes_stats,on=on, how='left')
+vulnerability_data = vulnerability_data.drop(drop, axis=1)
 
 #%%
-vulnerability_data = vulnerability_data.merge(cardiovascular_stats, 
-                                                 on=['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN', 'SEXO', 'RANGO'],
-                                                 how='left')
-vulnerability_data = vulnerability_data.drop(['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'], axis=1)
+vulnerability_data = vulnerability_data.merge(hypertension_stats, on=on, how='left')
+vulnerability_data = vulnerability_data.drop(drop, axis=1)
+
 #%%
-vulnerability_data = vulnerability_data.merge(renal_stats, 
-                                                 on=['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN', 'SEXO', 'RANGO'],
-                                                 how='left')
-vulnerability_data = vulnerability_data.drop(['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'], axis=1)
+vulnerability_data = vulnerability_data.merge(cardiovascular_stats, on=on, how='left')
+vulnerability_data = vulnerability_data.drop(drop, axis=1)
+#%%
+vulnerability_data = vulnerability_data.merge(renal_stats, on=on, how='left')
+vulnerability_data = vulnerability_data.drop(drop, axis=1)
 
 
 #%%
@@ -270,31 +272,6 @@ vulnerability_index_full['PAR'] = vulnerability_index_full['V_index'].mul(vulner
 vulnerability_index_full['PAI'] = vulnerability_index_full['CAMAS_1000hab'].mul(vulnerability_index_full['PAR']).round(0)
 
 #%%
-# Data for "El Universal"
-data_universal = vulnerability_index_full.copy()
-
-comorbidites_pop = vulnerability_index.groupby(['CLAVE', 'NOM_ENT', 'CLAVE_ENT', 'MUN'])[
-                                        'POB', 'POP-Obesity', 'POP-Smoking', 'POP-Diabetes', 
-                                        'POP-Hypertension', 'POP-Cardiovascular', 'POP-Renal'].sum().reset_index()
-comorbidites_pop = comorbidites_pop.rename(columns={'CLAVE':'CVEGEO'})
-
-
-data_universal = data_universal.merge(comorbidites_pop, on=['CVEGEO', 'NOM_ENT', 'CLAVE_ENT', 'MUN'], how='left')
-
-#data_universal.to_csv(clean_data + 'data_universal.csv', encoding='latin', index=False)
-
-
-
-medical_staff = pd.read_excel('D:/Users/Daniel_Avila/Documents/CMEI/Proyectos/Covid19/Articulo/data/' + 'personal_medico.xlsx')
-medical_staff['CVE_ENT'] = medical_staff['CVE_ENT'].map('{:0>2}'.format)
-medical_staff['CVE_MUN'] = medical_staff['CVE_MUN'].map('{:0>3}'.format)
-medical_staff['CVEGEO'] = medical_staff['CVE_ENT'] + medical_staff['CVE_MUN']
-
-medical_staff_columns = list(medical_staff.columns)
-medical_staff_summary = medical_staff.groupby(['CVEGEO'])[medical_staff_columns[8:]].sum().reset_index()
-#medical_staff_summary.to_csv(clean_data + 'medical_staff_summary.csv')
-
-#%%
 # Erase total available beds per municipality
 vulnerability_index_full = vulnerability_index_full.drop(['TOTAL DE CAMAS'], axis=1)
 vulnerability_index_full_graphs = pd.melt(vulnerability_index_full, 
@@ -304,6 +281,7 @@ vulnerability_index_full_graphs = pd.melt(vulnerability_index_full,
                                    var_name='V_type', value_name='Value')
 
 vulnerability_index_full_summary = vulnerability_index_full.groupby(['CLAVE_ENT'])['POB', 'PAR', 'PAI'].sum().reset_index()
+
 #%%
 # Population at risk and with access to health services per State, Municipality and Sex
 
@@ -387,21 +365,21 @@ vulnerability_municipality_graphs = pd.melt(vulnerability_municipality,
                                             var_name = 'Index', value_name='Count')
 
 #%%
-# Save files
-#vulnerability_index.to_csv(clean_data + 'comorbilityIndex.csv')
-#vulnerability_index_summary.to_csv(clean_data + 'vulnerabilityIndex.csv')
-#vulnerability_index_graphs.to_csv(clean_data + 'vulnerability_index_graphs.csv')
-#vulnerability_pop_graphs.to_csv(clean_data + 'vulnerability_pop_graphs.csv')
-#vulnerability_poverty_index.to_csv(clean_data + 'vulnerability_poverty_index.csv')
-#total_beds_hosp_summary.to_csv(clean_data + 'total_beds_hosp_summary.csv')
-#vulnerability_index_full.to_csv(clean_data + 'vulnerability_index_full.csv')
-#vulnerability_index_full_graphs.to_csv(clean_data + 'vulnerability_index_full_graphs.csv')
-#vulnerability_index_sex.to_csv(clean_data + 'vulnerability_index_sex.csv', encoding='latin')
-#vulnerability_index_sex_state.to_csv(clean_data + 'vulnerability_index_sex_state.csv', encoding='latin')
-#vulnerability_index_sex_graph.to_csv(clean_data + 'vulnerability_index_sex_graph.csv', encoding='latin')
-#vulnerability_index_sex_graph2.to_csv(clean_data + 'vulnerability_index_sex_graph2.csv', encoding='latin')
-#vulnerability_municipality.to_csv(clean_data + 'vulnerability_municipality.csv', encoding='utf-8')
-#vulnerability_municipality_graphs.to_csv(clean_data + 'vulnerability_municipality_graphs.csv', encoding='utf-8')
+# Save files for graphs in R with ggplot2
+vulnerability_index.to_csv(clean_data + 'comorbilityIndex.csv')
+vulnerability_index_summary.to_csv(clean_data + 'vulnerabilityIndex.csv')
+vulnerability_index_graphs.to_csv(clean_data + 'vulnerability_index_graphs.csv')
+vulnerability_pop_graphs.to_csv(clean_data + 'vulnerability_pop_graphs.csv')
+vulnerability_poverty_index.to_csv(clean_data + 'vulnerability_poverty_index.csv')
+total_beds_hosp_summary.to_csv(clean_data + 'total_beds_hosp_summary.csv')
+vulnerability_index_full.to_csv(clean_data + 'vulnerability_index_full.csv')
+vulnerability_index_full_graphs.to_csv(clean_data + 'vulnerability_index_full_graphs.csv')
+vulnerability_index_sex.to_csv(clean_data + 'vulnerability_index_sex.csv', encoding='latin')
+vulnerability_index_sex_state.to_csv(clean_data + 'vulnerability_index_sex_state.csv', encoding='latin')
+vulnerability_index_sex_graph.to_csv(clean_data + 'vulnerability_index_sex_graph.csv', encoding='latin')
+vulnerability_index_sex_graph2.to_csv(clean_data + 'vulnerability_index_sex_graph2.csv', encoding='latin')
+vulnerability_municipality.to_csv(clean_data + 'vulnerability_municipality.csv', encoding='utf-8')
+vulnerability_municipality_graphs.to_csv(clean_data + 'vulnerability_municipality_graphs.csv', encoding='utf-8')
 
 
 
