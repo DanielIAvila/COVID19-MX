@@ -2,7 +2,13 @@
 """
 Created on Thu Aug 20 17:02:22 2020
 
-@author: DanielAvila
+@author: Daniel Itzamna Avila Ortega
+@Institution: Mexican Center of Industrial Ecology
+@DOI: https://doi.org/10.22201/igg.25940694e.2020.2.73    
+@Publication: An index of municipality-level vulnerability to COVID-19 in Mexico.
+    
+        This is the fourth code from the research on the Vulnerability Index 
+        for municipalities in Mexico with regards to the COVID19.
 """
 
 import functools
@@ -11,8 +17,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-raw_data = 'D:/Users/Daniel_Avila/Documents/CMEI/Proyectos/Covid19/Articulo/data/SSA_DB/'
-clean_data = 'D:/Users/Daniel_Avila/Documents/CMEI/Proyectos/Covid19/Articulo/data/clean/'
+raw_data = '~RawData/'
+clean_data = '~CleanData/'
 
 rawData = pd.read_csv(raw_data + '200819COVID19MEXICO.csv', header='infer', encoding='ANSI')
 
@@ -69,6 +75,7 @@ covid_age.rename(columns={'CONTEO': 'CASOS'}, inplace=True)
 
 covid_age = covid_age.pivot(index='CVEGEO', columns='EDAD', values='CASOS')
 #%% 
+
 # 1: Counts how many had the comorbidites of interest (all),
 #           how many had other comorbidites
 def createSummaryShort(dataframe, factor="", name="", condition=True):
@@ -254,11 +261,7 @@ covid_mun_pop.rename(columns={'POB_y':'POB'},  inplace=True)
 covid_mun_pop_commorbidity = covid_mun_pop_commorbidity.merge(vi_data_interest, left_index=True, right_index=True)
 del covid_mun_pop_commorbidity['POB_x']
 covid_mun_pop_commorbidity.rename(columns={'POB_y':'POB'},  inplace=True)
-#%%    
-# Applies expansion factor for modeling purposes
-#covid_mun_pop_exp = covid_mun_pop.copy()
-#covid_mun_pop_exp['CASOS'] = covid_mun_pop_exp['CASOS'].mul(4)
-#covid_mun_pop_exp['NORM-EXP'] = covid_mun_pop_exp['CASOS'].div(covid_mun_pop_exp['POB']).round(6)
+
 #%%    
 
 # 6: Correlation analysis
@@ -269,13 +272,5 @@ covid_mun_pop_com_corr = covid_mun_pop_commorbidity.loc[:, ['V_index',
                                                  'NORM-TOTAL-O', 'NORM-TOTAL-D',
                                                  'NORM-TOTAL-H', 'NORM-TOTAL-C']]
 
-#covid_mun_pop_exp = covid_mun_pop_exp.loc[:,['V_index', 'NORM-EXP']]
-
-
 covid_mun_pop_corr.to_csv(clean_data + 'covid_mun_pop_corr.csv')
 covid_mun_pop_com_corr.to_csv(clean_data + 'covid_mun_pop_com_corr.csv')
-
-
-#%%
-
-#covid_Index.to_csv(clean_data + 'covid_SSA.csv', encoding='UTF-8')
