@@ -15,9 +15,9 @@ import gc
 import numpy as np
 import pandas as pd
 
-ageb = 'D:/Users/Daniel_Avila/Documents/ArcGIS_Shapes/AGEB2018/datos/'
-raw_data = 'D:/Users/Daniel_Avila/Documents/CMEI/Proyectos/Covid19/Articulo/data/'
-clean_data = 'D:/Users/Daniel_Avila/Documents/CMEI/Proyectos/Covid19/Articulo/data/clean/'
+ageb = '~/AGEB2018/datos/'                                          # AGEB2018 recovered from INEGI, Marco Geoestadístico: https://www.inegi.org.mx/temas/mg/#Descargas
+raw_data = '~/RawData/'
+clean_data = '~/CleanData/'
 
     #######################################
     #        Loads files to process       #
