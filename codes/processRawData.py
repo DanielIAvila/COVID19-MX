@@ -2,8 +2,11 @@
 """
 Created on Sat Apr  4 18:04:32 2020
 
-@author: DanielAvila
-
+@author: Daniel Itzamna Avila Ortega
+@Centre: Mexican Center of Industrial Ecology
+@DOI: https://doi.org/10.22201/igg.25940694e.2020.2.73    
+@Publication: An index of municipality-level vulnerability to COVID-19 in Mexico.
+    
         This is the first code from the research on the Vulnerability Index 
         for municipalities in Mexico with regards to the COVID19.
 """
